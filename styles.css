@@ -1,0 +1,11 @@
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    line-height: 1.6;
+    color: #1a1a1a;
+}
+h1 { margin-bottom: 0.25rem; }
+header p { color: #666; }
+main { margin-top: 2.5rem;}
