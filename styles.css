@@ -1,3 +1,7 @@
+header {
+    display: grid;
+}
+
 body {
     font-family: system-ui, sans-serif;
     max-width: 42rem;
@@ -7,5 +11,6 @@ body {
     color: #1a1a1a;
 }
 h1 { margin-bottom: 0.25rem; }
-header p { color: #666; }
+header h1 { color: #004d66}
+header h2 { color: #66333b; }
 main { margin-top: 2.5rem;}
