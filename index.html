@@ -1,24 +1,589 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name = "viewport" content = "width = device-width, initial-scale = 1">
-    <title>James Hawkins</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="James Hawkins: data warehouse and BI developer in Omaha, Nebraska. Experience, projects, and contact.">
+<title>James Hawkins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a data-lineage page. Each section is an "entity" joined by a thin connector rail;
+   highway-sign green for structure, road-marking amber used once per section for emphasis. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #14202e;
+  --muted: #566475;
+  --line: #d5dce4;
+  --accent: #0b6e4f;        /* NDOT highway-sign green */
+  --accent-soft: #e2f1eb;
+  --mark: #c98a0b;          /* road-marking amber */
+  --mark-soft: #fbf1d9;
+  --code-bg: #eef2f5;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: clamp(1.75rem, 1.3rem + 2vw, 2.4rem);
+  --step-4: clamp(2.6rem, 1.6rem + 5vw, 4.6rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d141c; --surface: #131d28; --ink: #e5ebf1; --muted: #9aa8b8; --line: #243243;
+    --accent: #3cb68b; --accent-soft: #12302a; --mark: #f0bf4c; --mark-soft: #2e2611; --code-bg: #182532;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d141c; --surface: #131d28; --ink: #e5ebf1; --muted: #9aa8b8; --line: #243243;
+  --accent: #3cb68b; --accent-soft: #12302a; --mark: #f0bf4c; --mark-soft: #2e2611; --code-bg: #182532;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: var(--step-0); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--mark); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1; }
+p { margin: 0; }
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.mono { font-family: var(--mono); }
+.label {
+  font-family: var(--mono); font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* nav */
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: var(--step-1); color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }
+.brand span { color: var(--accent); }
+nav ul { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; justify-content: flex-end; }
+nav a { font-size: var(--step--1); color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 999px; }
+nav a:hover { color: var(--ink); background: var(--code-bg); }
+@media (max-width: 640px) { nav .hide-sm { display: none; } }
+
+/* hero */
+.hero { padding-block: clamp(40px, 7vw, 88px) clamp(32px, 5vw, 56px); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+@media (max-width: 860px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+.entity-photo { position: relative; margin: 0; border-bottom: 1px solid var(--line); }
+.entity-photo img { display: block; width: 100%; aspect-ratio: 5 / 4; object-fit: cover; object-position: 50% 12%; background: var(--code-bg); }
+.entity-photo .cap { position: absolute; left: 10px; bottom: 10px; font-family: var(--mono); font-size: 0.7rem; padding: 3px 7px; border-radius: 4px; background: rgba(13, 20, 28, .72); color: #e5ebf1; }
+.hero .entity { max-width: 420px; width: 100%; justify-self: end; }
+@media (max-width: 860px) { .hero .entity { justify-self: start; } }
+.hero h1 { font-size: var(--step-4); font-weight: 800; letter-spacing: -0.035em; }
+.hero h1 .ln2 { color: var(--accent); display: block; }
+.hero .lede { font-size: var(--step-1); color: var(--muted); max-width: 34em; margin-top: 20px; }
+.hero .lede strong { color: var(--ink); font-weight: 600; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; font: 500 var(--step--1)/1 var(--body);
+  padding: 11px 16px; border-radius: 8px; text-decoration: none; border: 1px solid var(--line);
+  color: var(--ink); background: var(--surface); cursor: pointer; transition: border-color .15s, transform .15s;
+}
+.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+/* entity card (ER-diagram style) */
+.entity {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  font-family: var(--mono); font-size: 0.875rem; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px rgba(13, 30, 45, .45);
+}
+.entity-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px; background: var(--accent); color: var(--bg); }
+.entity-head b { font-weight: 500; }
+.entity-head small { opacity: .8; }
+.entity table { width: 100%; border-collapse: collapse; }
+.entity td { padding: 8px 16px; border-top: 1px solid var(--line); vertical-align: top; }
+.entity td:first-child { color: var(--muted); width: 1%; white-space: nowrap; }
+.entity td:nth-child(2) { color: var(--muted); width: 1%; white-space: nowrap; font-size: 0.75rem; }
+.entity td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.pk { color: var(--mark); font-size: 0.7rem; margin-right: 6px; }
+.entity tr.hl td:last-child { color: var(--accent); font-weight: 500; }
+
+/* stats band */
+.stats { border-block: 1px solid var(--line); background: var(--surface); }
+.stats .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-block: 24px; gap: 16px; }
+@media (max-width: 720px) { .stats .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat b { display: block; font-family: var(--display); font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: var(--step--1); color: var(--muted); }
+
+/* sections */
+section.block { padding-block: clamp(48px, 7vw, 88px); }
+.sec-head { display: grid; gap: 8px; margin-bottom: 32px; max-width: 46em; }
+.sec-head h2 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; }
+.sec-head p { color: var(--muted); }
+
+/* experience timeline */
+.timeline { position: relative; display: grid; gap: 20px; padding-left: 28px; }
+.timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: repeating-linear-gradient(to bottom, var(--line) 0 8px, transparent 8px 14px); }
+.job { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: clamp(18px, 3vw, 28px); }
+.job::before { content: ""; position: absolute; left: -27px; top: 26px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.job.current::before { background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+.job-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.job h3 { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.01em; }
+.job .org { color: var(--muted); margin-top: 4px; }
+.when { font-family: var(--mono); font-size: var(--step--1); color: var(--muted); white-space: nowrap; }
+.pill { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-left: 8px; vertical-align: middle; }
+.job ul { margin: 16px 0 0; padding-left: 1.1em; display: grid; gap: 8px; max-width: 70ch; }
+.job li::marker { color: var(--accent); }
+.num { font-family: var(--mono); font-weight: 500; color: var(--ink); background: var(--mark-soft); padding: 0 4px; border-radius: 3px; font-size: 0.92em; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+.tag { font-family: var(--mono); font-size: 0.75rem; padding: 4px 8px; border-radius: 5px; background: var(--code-bg); color: var(--muted); }
+
+/* projects */
+.projects { display: grid; gap: 28px; }
+.project { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.project-body { padding: clamp(20px, 3.5vw, 36px); display: grid; gap: 18px; }
+.project h3 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; }
+.project .sub { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: var(--step--1); font-family: var(--mono); }
+.project p.desc { max-width: 68ch; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 760px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.point { display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 8px; }
+.point h4 { margin: 0; font-family: var(--body); font-size: var(--step-0); font-weight: 600; }
+.point p { color: var(--muted); font-size: 0.9375rem; }
+
+/* pipeline diagram */
+.pipeline-wrap { background: var(--code-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px clamp(16px, 3vw, 28px); overflow-x: auto; }
+.pipeline { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 0; min-width: 640px; align-items: stretch; }
+.stage { position: relative; padding: 0 18px; display: grid; gap: 8px; align-content: start; }
+.stage + .stage { border-left: 1px dashed var(--line); }
+.stage .label { color: var(--accent); }
+.node { font-family: var(--mono); font-size: 0.8rem; padding: 7px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+.node.out { border-color: var(--mark); background: var(--mark-soft); }
+.stage:not(:last-child)::after {
+  content: "→"; position: absolute; right: -9px; top: -2px; font-family: var(--mono); color: var(--accent);
+  background: var(--code-bg); padding: 0 2px; line-height: 1.2;
+}
+.flow-dot { position: absolute; top: 4px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--mark); opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .pipeline .flow-dot { animation: flow 4.8s linear infinite; }
+}
+@keyframes flow { 0% { left: 2%; opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { left: 96%; opacity: 0; } }
+.pipeline { position: relative; }
+
+.ai-note { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; padding: 18px; border-radius: 8px; background: var(--accent-soft); }
+.ai-note svg { width: 22px; height: 22px; color: var(--accent); margin-top: 2px; }
+.ai-note p { color: var(--ink); }
+
+.features { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .features { grid-template-columns: minmax(0, 1fr); } }
+.features li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; }
+.features .k { min-width: 4.5em; font-family: var(--mono); font-size: 0.75rem; color: var(--accent); padding-top: 3px; }
+.features b { display: block; font-weight: 600; }
+.features span { color: var(--muted); font-size: 0.9375rem; }
+
+/* skills */
+.skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 720px) { .skills { grid-template-columns: minmax(0, 1fr); } }
+.skill-group { padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); display: grid; gap: 12px; align-content: start; }
+.skill-group h3 { font-family: var(--body); font-size: var(--step-0); font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.skill-group h3 .label { font-size: 0.7rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 0.8125rem; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
+.chip.used { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+
+/* education */
+.edu { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 820px) { .edu { grid-template-columns: minmax(0, 1fr); } }
+.panel { padding: clamp(20px, 3vw, 28px); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); display: grid; gap: 16px; align-content: start; }
+.panel h3 { font-size: var(--step-2); font-weight: 700; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px; font-size: 0.9375rem; }
+.kv dt { color: var(--muted); font-family: var(--mono); font-size: var(--step--1); padding-top: 2px; }
+.kv dd { margin: 0; }
+.courses { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.courses li { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 0.9375rem; }
+.courses li:first-child { border-top: 0; }
+.courses .code { font-family: var(--mono); font-size: var(--step--1); color: var(--accent); padding-top: 2px; }
+.courses .ip { font-family: var(--mono); font-size: 0.7rem; color: var(--mark); margin-left: 6px; }
+.honors { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.honors li { padding-left: 18px; position: relative; }
+.honors li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 8px; background: var(--mark); transform: rotate(45deg); }
+
+/* network */
+.network { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .network { grid-template-columns: minmax(0, 1fr); } }
+.net { padding: 20px; border-top: 3px solid var(--accent); background: var(--surface); border-radius: 0 0 10px 10px; display: grid; gap: 6px; align-content: start; }
+.net h3 { font-size: var(--step-1); font-weight: 700; }
+.net p { color: var(--muted); font-size: 0.9375rem; }
+
+/* contact */
+.contact { background: var(--accent); color: var(--bg); }
+.contact .wrap { padding-block: clamp(48px, 7vw, 80px); display: grid; gap: 22px; }
+.contact h2 { font-size: var(--step-3); font-weight: 800; letter-spacing: -0.02em; max-width: 20em; }
+.contact p { opacity: .88; max-width: 52ch; }
+.contact-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.contact .btn { background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 45%, transparent); }
+.contact .btn:hover { border-color: var(--bg); }
+.email { font-family: var(--mono); font-size: var(--step-1); user-select: all; word-break: break-all; }
+#copy-status { font-family: var(--mono); font-size: var(--step--1); min-height: 1.2em; }
+footer { padding-block: 24px; color: var(--muted); font-size: var(--step--1); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+
+/* load-in, from a visible resting state */
+@media (prefers-reduced-motion: no-preference) {
+  .hero h1, .hero .lede, .hero .cta, .entity { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
+  .hero .lede { animation-delay: .08s; } .hero .cta { animation-delay: .14s; } .entity { animation-delay: .2s; }
+}
+@keyframes rise { from { transform: translateY(10px); } to { transform: none; } }
+</style>
 </head>
 <body>
-    <header>
-        <h1>James Hawkins</h1>
-        <h2>The Professional Portfolio</h2>
-    </header>
-    <main>
-        <h2>About Me</h2>
-        <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-            Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-            Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-            Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-            Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-        </p>
-    </main>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">JH<span>.</span></a>
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li class="hide-sm"><a href="#skills">Skills</a></li>
+        <li class="hide-sm"><a href="#education">Education</a></li>
+        <li class="hide-sm"><a href="#network">Network</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="label">Data warehouse &amp; BI developer · Omaha, Nebraska</p>
+        <h1 style="margin-top:14px">James Hawkins<span class="ln2">turns data into decisions.</span></h1>
+        <p class="lede">I’m a senior <strong>computer science</strong> student at the University of Nebraska–Lincoln and a data warehouse developer intern at the <strong>Nebraska Department of Transportation</strong>, where I document enterprise databases and build the reports state teams run on. On my own time I build data pipelines, most recently an always-on scanner for prediction markets. I graduate in May 2027 and I’m looking for <strong>full-time</strong> data and BI roles. I’m based in Omaha and always willing to relocate for the right job.</p>
+        <div class="cta">
+          <a class="btn primary" href="#projects">See projects</a>
+          <a class="btn" href="https://github.com/JamesHawkins7" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+            GitHub
+          </a>
+          <a class="btn" href="https://www.linkedin.com/in/james-hawkins-123456789123456789/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+
+      <figure class="entity" style="margin:0" aria-label="Profile summary, styled as a database record">
+        <div class="entity-head"><b>dbo.james_hawkins</b><small>1 row</small></div>
+        <div class="entity-photo">
+          <img src="headshot.jpg" alt="James Hawkins in a dark blazer and white shirt, smiling outdoors in front of pine trees" width="640" height="800">
+          <span class="cap">photo · varbinary(max)</span>
+        </div>
+        <table>
+          <tbody>
+            <tr><td><span class="pk">PK</span>name</td><td>varchar</td><td>James Hawkins</td></tr>
+            <tr><td>role</td><td>varchar</td><td>DW Developer Intern</td></tr>
+            <tr><td>employer</td><td>varchar</td><td>Nebraska DOT</td></tr>
+            <tr><td>school</td><td>varchar</td><td>UNL · CS ’27</td></tr>
+            <tr class="hl"><td>gpa</td><td>decimal(4,3)</td><td>3.921</td></tr>
+            <tr class="hl"><td>schemas_documented</td><td>int</td><td>244</td></tr>
+            <tr class="hl"><td>reports_built</td><td>int</td><td>100+</td></tr>
+            <tr><td>seeking</td><td>varchar</td><td>Full-time roles</td></tr>
+            <tr><td>relocate</td><td>bit</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </figure>
+    </div>
+  </section>
+
+  <div class="stats" aria-label="Highlights">
+    <div class="wrap">
+      <div class="stat"><b>244</b><span>schemas documented in ER/Studio</span></div>
+      <div class="stat"><b>100+</b><span>BI reports built for NDOT</span></div>
+      <div class="stat"><b>8</b><span>NDOT districts supported</span></div>
+      <div class="stat"><b>222</b><span>unit tests on my scanner project</span></div>
+    </div>
+  </div>
+
+  <section class="block" id="experience">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Experience</p>
+        <h2>Two years inside a state agency’s data</h2>
+        <p>Both roles at the Nebraska Department of Transportation, first on the network and support side, now in the data warehouse.</p>
+      </div>
+      <div class="timeline">
+        <article class="job current">
+          <div class="job-top">
+            <div>
+              <h3>Data Warehouse IT Applications Developer Intern <span class="pill">Current</span></h3>
+              <p class="org">Nebraska Department of Transportation</p>
+            </div>
+            <span class="when">May 2025 – Present</span>
+          </div>
+          <ul>
+            <li>Documented <span class="num">3</span> statewide enterprise database structures and data models in ER/Studio, covering <span class="num">244</span> schemas so the Data Warehouse team could organize and understand its servers.</li>
+            <li>Built and optimized <span class="num">100+</span> business intelligence reports for business groups across NDOT with Microsoft Report Builder and SQL Server Reporting Services (SSRS), improving understanding and resource allocation.</li>
+            <li>Wrote T-SQL queries, views, and stored procedures that supply reporting datasets for Report Builder reports and Power BI dashboards.</li>
+            <li>Managed SSRS report storage and permission groups to control which business users can access each report.</li>
+            <li>Created process flow diagrams of how data moves through the state’s Workday systems, making data lineage visible to technical and business teams.</li>
+            <li>Analyzed large datasets in Excel to find trends and validate data across sources.</li>
+            <li>Used Git and Azure DevOps for version control and change tracking within an Agile sprint process.</li>
+          </ul>
+          <div class="tags"><span class="tag">T-SQL</span><span class="tag">SSRS</span><span class="tag">Report Builder</span><span class="tag">Power BI</span><span class="tag">ER/Studio</span><span class="tag">Azure DevOps</span><span class="tag">Excel</span></div>
+        </article>
+
+        <article class="job">
+          <div class="job-top">
+            <div>
+              <h3>Unified Communication Technology Intern</h3>
+              <p class="org">Nebraska Department of Transportation</p>
+            </div>
+            <span class="when">Apr 2024 – May 2025</span>
+          </div>
+          <ul>
+            <li>Supported network services and end users across all <span class="num">8</span> NDOT districts, mapping networks in Visio.</li>
+            <li>Resolved <span class="num">50+</span> statewide technology incidents and service requests through the Service Portal ticketing system.</li>
+            <li>Improved data quality in the Lucity Asset Management System by adding, updating, and reorganizing NDOT asset records.</li>
+          </ul>
+          <div class="tags"><span class="tag">Visio</span><span class="tag">Lucity</span><span class="tag">Service Portal</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="projects" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Projects</p>
+        <h2>Things I’ve built outside the day job</h2>
+      </div>
+
+      <div class="projects">
+        <article class="project">
+          <div class="project-body">
+            <div class="sub"><span>Personal project</span><span>Oct 2026 – Present</span><span>Python · SQLite · Linux</span></div>
+            <h3>Kalshi–Polymarket Arbitrage Server</h3>
+            <p class="desc">Kalshi and Polymarket US often list the same real-world question, like which party wins the House, at slightly different prices. This server watches both exchanges around the clock, works out which contracts truly settle on the same outcome, and flags price gaps that would still be profitable after fees and order-book depth. It is read-only by design: it records, analyzes, and paper-trades, and never places a real order.</p>
+          </div>
+          <div class="pipeline-wrap" aria-label="Pipeline diagram">
+            <div class="pipeline">
+              <span class="flow-dot" aria-hidden="true"></span>
+              <div class="stage">
+                <span class="label">1 · Ingest</span>
+                <span class="node">REST catalog</span>
+                <span class="node">WebSocket books</span>
+                <span class="node">FIX market data</span>
+              </div>
+              <div class="stage">
+                <span class="label">2 · Match</span>
+                <span class="node">Up to 3,000 markets</span>
+                <span class="node">Settlement-rule review</span>
+              </div>
+              <div class="stage">
+                <span class="label">3 · Validate</span>
+                <span class="node">Fees &amp; depth</span>
+                <span class="node">Data freshness</span>
+                <span class="node">Contract terms</span>
+              </div>
+              <div class="stage">
+                <span class="label">4 · Output</span>
+                <span class="node out">SQLite snapshots</span>
+                <span class="node out">Paper trades · 8 strategies</span>
+              </div>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="two">
+              <div class="point"><h4>Live, always-on pipeline</h4><p>Ingests order-book data from both exchanges through REST, WebSocket, and FIX feeds, runs as a hardened Linux service, and logs snapshots to SQLite so any moment can be replayed.</p></div>
+              <div class="point"><h4>Validation before any signal</h4><p>An opportunity only counts if contract rules match, the data is fresh, and the book is deep enough after conservative fee math. A paper simulator tests 8 strategies without risking money.</p></div>
+            </div>
+            <div class="ai-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+              <p><strong>Built with AI as a force multiplier.</strong> I used Claude and ChatGPT to plan the architecture, write and debug code, and scale a solo idea into about <span class="num">7,300</span> lines of Python backed by <span class="num">222</span> unit tests. Every piece of AI-generated code was reviewed and tested before it ran on the server.</p>
+            </div>
+            <div class="tags"><span class="tag">Python 3.11</span><span class="tag">SQLite</span><span class="tag">WebSocket</span><span class="tag">FIX protocol</span><span class="tag">systemd</span><span class="tag">Claude Code</span><span class="tag">ChatGPT</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <div class="project-body">
+            <div class="sub"><span>Senior design · 5-person Agile team</span><span>Aug 2026 – Present</span><span>Unity · C# · Meta Quest</span></div>
+            <h3>Nebraska Trucking Association VR Game</h3>
+            <p class="desc">A virtual reality game on Meta Quest where players work through hands-on truck maintenance: changing a tire, fixing the coolant system, and replacing a headlight. I joined an existing codebase and focused on making the physical interactions feel right.</p>
+            <ul class="features">
+              <li><span class="k">physics</span><div><b>Two-handed tire carrying</b><span>A heavy-tire physics material so the tire handles with real weight and needs both hands.</span></div></li>
+              <li><span class="k">input</span><div><b>Entering the cab</b><span>Players get in and out of the truck by grabbing the door handles.</span></div></li>
+              <li><span class="k">bounds</span><div><b>Play-area boundaries</b><span>Barriers that push players back into bounds across all 4 scenes.</span></div></li>
+              <li><span class="k">state</span><div><b>Tool respawn</b><span>Tools dropped in the coolant scene return when they hit the floor.</span></div></li>
+            </ul>
+            <div class="tags"><span class="tag">Unity</span><span class="tag">C#</span><span class="tag">XR Interaction Toolkit</span><span class="tag">Meta Quest</span><span class="tag">Git</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="skills" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Skills</p>
+        <h2>Toolkit</h2>
+        <p>Green-outlined tools are ones I use every week at NDOT.</p>
+      </div>
+      <div class="skills">
+        <div class="skill-group">
+          <h3>Data &amp; BI <span class="label">reporting</span></h3>
+          <div class="chips"><span class="chip used">SQL Server (SSMS)</span><span class="chip used">T-SQL</span><span class="chip used">SSRS</span><span class="chip used">Power BI</span><span class="chip used">Report Builder</span><span class="chip used">Excel</span></div>
+        </div>
+        <div class="skill-group">
+          <h3>Modeling &amp; documentation <span class="label">lineage</span></h3>
+          <div class="chips"><span class="chip used">ER/Studio</span><span class="chip">Visio</span><span class="chip used">Process flows</span><span class="chip">Relational design</span><span class="chip">Data warehousing</span></div>
+        </div>
+        <div class="skill-group">
+          <h3>Languages &amp; tools <span class="label">build</span></h3>
+          <div class="chips"><span class="chip">Python</span><span class="chip">C#</span><span class="chip">HTML/CSS</span><span class="chip">JavaScript (React)</span><span class="chip used">Git</span><span class="chip used">Azure DevOps</span><span class="chip">Unity</span><span class="chip">Lucity</span></div>
+        </div>
+        <div class="skill-group">
+          <h3>AI tools <span class="label">assist</span></h3>
+          <div class="chips"><span class="chip">Claude Code</span><span class="chip">ChatGPT</span><span class="chip">GitHub Copilot</span><span class="chip">Microsoft Copilot Studio</span><span class="chip">Prompt engineering</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="education" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Education</p>
+        <h2>University of Nebraska–Lincoln</h2>
+      </div>
+      <div class="edu">
+        <div class="panel">
+          <dl class="kv">
+            <dt>Degree</dt><dd>Computer Science, minor in Entrepreneurship</dd>
+            <dt>Program</dt><dd>University Honors Program</dd>
+            <dt>Graduates</dt><dd>May 2027</dd>
+            <dt>GPA</dt><dd class="mono">3.921</dd>
+          </dl>
+          <div>
+            <p class="label" style="margin-bottom:6px">Relevant coursework</p>
+            <ul class="courses">
+              <li><span class="code">CSCE 310</span><span>Data Structures &amp; Algorithms</span></li>
+              <li><span class="code">CSCE 423</span><span>Design &amp; Analysis of Algorithms</span></li>
+              <li><span class="code">CSCE 361</span><span>Software Engineering</span></li>
+              <li><span class="code">STAT 380</span><span>Statistics &amp; Applications</span></li>
+              <li><span class="code">CSCE 443</span><span>Cybersecurity: Big Data &amp; Cloud<span class="ip">IN PROGRESS</span></span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Honors &amp; leadership</h3>
+          <ul class="honors">
+            <li>Regents Scholarship recipient</li>
+            <li>College of Engineering Dean’s List, every semester from Fall 2023 to Spring 2026</li>
+            <li>Kappa Sigma Fraternity, Alpha-Psi Chapter: Vice President and Lead Academic Chair</li>
+            <li>Kappa Sigma Outstanding Brother Award</li>
+            <li>Completed the Global Career Accelerator web development track</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="network" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Network</p>
+        <h2>Where we might cross paths</h2>
+        <p>If you’re a Creighton Prep alum, a fellow Husker, or a Kappa Sigma, I’d especially like to hear from you.</p>
+      </div>
+      <div class="network">
+        <div class="net">
+          <span class="label">High school</span>
+          <h3>Creighton Preparatory School</h3>
+          <p>Omaha, Nebraska · Graduate</p>
+        </div>
+        <div class="net">
+          <span class="label">University</span>
+          <h3>University of Nebraska–Lincoln</h3>
+          <p>Computer Science · Class of 2027</p>
+        </div>
+        <div class="net">
+          <span class="label">Fraternity</span>
+          <h3>Kappa Sigma, Alpha-Psi Chapter</h3>
+          <p>Vice President · Lead Academic Chair</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <p class="label" style="color:inherit;opacity:.8">Contact</p>
+      <h2>Hiring a data or BI developer? Let’s talk.</h2>
+      <p>I’m looking for full-time roles starting after I graduate in May 2027. I’m based in Omaha, Nebraska, and I’m always willing to move for work. Email is the fastest way to reach me.</p>
+      <div class="contact-row">
+        <span class="email" id="email">jamesbhawkins04@gmail.com</span>
+        <button class="btn" id="copy-btn" type="button">Copy email</button>
+      </div>
+      <div class="contact-row">
+        <a class="btn" href="https://github.com/JamesHawkins7" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/james-hawkins-123456789123456789/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <p id="copy-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 James Hawkins</span>
+    <span class="mono">Omaha, NE</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-btn');
+  var status = document.getElementById('copy-status');
+  var email = document.getElementById('email');
+  function selectEmail() {
+    var range = document.createRange();
+    range.selectNodeContents(email);
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+  btn.addEventListener('click', function () {
+    var text = email.textContent.trim();
+    var done = function () { status.textContent = 'Copied to clipboard.'; };
+    var fail = function () { selectEmail(); status.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.'; };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fail);
+      } else { fail(); }
+    } catch (e) { fail(); }
+  });
+})();
+</script>
 </body>
 </html>
